@@ -1,27 +1,27 @@
-﻿using Lumen.Modules.Calendar.Common.Models;
+using Lumen.Modules.Calendar.Common.Models;
 
 using Microsoft.EntityFrameworkCore;
 
 namespace Lumen.Modules.Calendar.Data {
-    public class CalendarContext : DbContext {
-        public const string SCHEMA_NAME = "Calendar";
+    public class CalendarContext(DbContextOptions<CalendarContext> options) : DbContext(options) {
+        public const string SCHEMA_NAME = "calendar";
 
-        public CalendarContext(DbContextOptions<CalendarContext> options) : base(options) {
-        }
-
-        public DbSet<CalendarPointInTime> Calendar { get; set; } = null!;
+        public DbSet<CalendarSource> CalendarSources { get; set; } = null!;
+        public DbSet<CalendarEvent> CalendarEvents { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
             modelBuilder.HasDefaultSchema(SCHEMA_NAME);
 
-            var CalendarModelBuilder = modelBuilder.Entity<CalendarPointInTime>();
-            CalendarModelBuilder.Property(x => x.Time)
+            var calendarSourceBuilder = modelBuilder.Entity<CalendarSource>();
+            calendarSourceBuilder.HasKey(x => x.Id);
+            calendarSourceBuilder.Property(x => x.Id).ValueGeneratedOnAdd();
+
+            var calendarEventBuilder = modelBuilder.Entity<CalendarEvent>();
+            calendarEventBuilder.HasKey(x => new { x.Uid, x.SourceName });
+            calendarEventBuilder.Property(x => x.Start)
                 .HasColumnType("timestamp with time zone");
-
-            CalendarModelBuilder.Property(x => x.Value)
-                .HasColumnType("integer");
-
-            CalendarModelBuilder.HasKey(x => x.Time);
+            calendarEventBuilder.Property(x => x.End)
+                .HasColumnType("timestamp with time zone");
         }
     }
 }
