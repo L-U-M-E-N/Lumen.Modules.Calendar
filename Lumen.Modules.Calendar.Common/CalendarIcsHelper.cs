@@ -26,7 +26,7 @@ namespace Lumen.Modules.Calendar.Common {
                 SourceName = sourceName,
                 Title = icsEvent.Summary ?? "No Title",
                 Description = string.IsNullOrWhiteSpace(icsEvent.Description) ? null : icsEvent.Description.Trim(),
-                Start = icsEvent.DtStart.AsUtc,
+                Start = icsEvent.DtStart!.AsUtc,
                 End = icsEvent.DtEnd?.AsUtc ?? icsEvent.DtStart.AsUtc,
             };
     }
